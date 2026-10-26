@@ -12,7 +12,7 @@ In addition, the machine can have up to **255** ports. While not specified by th
 | :----- | :-------------- |
 | 0x00   | terminal output |
 
-*more ports coming soon*
+_more ports coming soon_
 
 The Stanley/Penguin follows the **Von Neumann** architecture and uses the **Big Endian** system.
 
