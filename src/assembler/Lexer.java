@@ -7,24 +7,31 @@ import java.util.List;
  * Interprets raw file content into tokens.
  */
 public class Lexer {
-    public Lexer() {}
+    public Lexer() {
+    }
 
     /**
-     * Splits raw file content into a sequence of structured tokens. Lines are delimited by newline tokens.
-     * @param lines The raw file content, split by lines (empty lines should be included as {@code ""}). 
+     * Splits raw file content into a sequence of structured tokens. Lines are
+     * delimited by newline tokens.
+     * 
+     * @param lines The raw file content, split by lines (empty lines should be
+     *              included as {@code ""}).
      * @return The list of parsed tokens.
-     * @throws SyntaxException If disallowed chars are present or if key chars are used improperly.
+     * @throws SyntaxException If disallowed chars are present or if key chars are
+     *                         used improperly.
      */
     public List<Token> lex(String[] lines) throws SyntaxException {
         List<Token> tokens = new ArrayList<>();
 
         for (int i = 0; i < lines.length; i++) {
-            if (lines[i].isEmpty()) continue;
+            if (lines[i].isEmpty())
+                continue;
 
             // Truncate comments
             String cleaned = lines[i];
             int semicolonIndex = cleaned.indexOf(";");
-            if (semicolonIndex == 0) continue;
+            if (semicolonIndex == 0)
+                continue;
             if (semicolonIndex != -1) {
                 cleaned = cleaned.substring(0, semicolonIndex);
             }
@@ -37,9 +44,9 @@ public class Lexer {
                     char c = token.charAt(k);
                     if (!Format.isAllowed(c)) {
                         throw new SyntaxException(
-                            "Invalid character '" + c + "'.",
-                            i + 1, // line number
-                            lines[i] // line content
+                                "Invalid character '" + c + "'.",
+                                i + 1, // line number
+                                lines[i] // line content
                         );
                     }
                 }
@@ -55,7 +62,7 @@ public class Lexer {
                 // Handle identifier (:)
                 else if (token.endsWith(":")) {
                     validateIdentifier(token, i + 1, lines[i]);
-                    tokens.add(new Token(TokenType.IDENTIFIER, token.substring(0, token.length() -  1), i + 1));
+                    tokens.add(new Token(TokenType.IDENTIFIER, token.substring(0, token.length() - 1), i + 1));
                 }
                 // Fallback to value
                 else {
@@ -71,12 +78,13 @@ public class Lexer {
 
     /**
      * Validates a token that contains bracket dereferencing characters,
-     * ensuring that brackets are matched and properly placed. 
+     * ensuring that brackets are matched and properly placed.
      * 
-     * <p><b>Assumption</b>: {@code token} contains {@code '['} or {@code ']'}.
+     * <p>
+     * <b>Assumption</b>: {@code token} contains {@code '['} or {@code ']'}.
      *
-     * @param token The raw token to validate.
-     * @param lineNumber The line number (for error reporting).
+     * @param token       The raw token to validate.
+     * @param lineNumber  The line number (for error reporting).
      * @param lineContent The raw content of the entire line (for error reporting).
      * @throws SyntaxException If brackets are mismatched or improperly placed.
      */
@@ -110,13 +118,16 @@ public class Lexer {
     }
 
     /**
-     * Validates a token that ends with {@code ':'}, ensuring it contains no other colons.
-     * Also catches the edge case in which a reserved keyword is used as an identifier.
+     * Validates a token that ends with {@code ':'}, ensuring it contains no other
+     * colons.
+     * Also catches the edge case in which a reserved keyword is used as an
+     * identifier.
      * 
-     * <p><b>Assumption</b>: {@code token} ends with {@code ':'}.
+     * <p>
+     * <b>Assumption</b>: {@code token} ends with {@code ':'}.
      * 
-     * @param token The raw token to validate.
-     * @param lineNumber The line number (for error reporting).
+     * @param token       The raw token to validate.
+     * @param lineNumber  The line number (for error reporting).
      * @param lineContent The raw content of the entire line (for error reporting).
      * @throws SyntaxException If the token is an invalid identifier.
      */
@@ -129,9 +140,8 @@ public class Lexer {
         String identifier = token.substring(0, token.length() - 1);
         if (Format.parseInstruction(identifier) != null) {
             throw new SyntaxException(
-                "Reserved keyword '" + identifier + "' cannot be used as an identifier.",
-                lineNumber, lineContent
-            );
+                    "Reserved keyword '" + identifier + "' cannot be used as an identifier.",
+                    lineNumber, lineContent);
         }
     }
 }

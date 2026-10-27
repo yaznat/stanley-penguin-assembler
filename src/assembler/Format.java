@@ -10,7 +10,8 @@ public final class Format {
 
     /**
      * Maps a raw string value to an {@code Instruction}.
-     * @param s The string representation of an instruction (case sensitive). 
+     * 
+     * @param s The string representation of an instruction (case sensitive).
      * @return The matched instruction, or {@code null}.
      */
     public static Instruction parseInstruction(String s) {
@@ -46,6 +47,7 @@ public final class Format {
 
     /**
      * O(1) character lookup.
+     * 
      * @param c The character to validate.
      * @return {@code true} if the character is allowed, else {@code false}.
      */
