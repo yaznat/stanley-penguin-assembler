@@ -60,7 +60,7 @@ public class Lexer {
                     tokens.add(new Token(TokenType.INSTRUCTION, token, i + 1));
                 }
                 // Handle identifier (:)
-                else if (token.endsWith(":")) {
+                else if (token.contains(":")) {
                     validateIdentifier(token, i + 1, lines[i]);
                     tokens.add(new Token(TokenType.IDENTIFIER, token.substring(0, token.length() - 1), i + 1));
                 }
@@ -118,13 +118,13 @@ public class Lexer {
     }
 
     /**
-     * Validates a token that ends with {@code ':'}, ensuring it contains no other
-     * colons.
+     * Validates a token that contains {@code ':'}, ensuring the colon is used properly.
+     * 
      * Also catches the edge case in which a reserved keyword is used as an
      * identifier.
      * 
      * <p>
-     * <b>Assumption</b>: {@code token} ends with {@code ':'}.
+     * <b>Assumption</b>: {@code token} contains {@code ':'}.
      * 
      * @param token       The raw token to validate.
      * @param lineNumber  The line number (for error reporting).
@@ -133,7 +133,7 @@ public class Lexer {
      */
     private void validateIdentifier(String token, int lineNumber, String lineContent) throws SyntaxException {
         if (token.indexOf(':') != token.length() - 1) {
-            throw new SyntaxException("Invalid placement of character ':'.", lineNumber, lineContent);
+            throw new SyntaxException("Misplaced ':' in token '" + token + "'.", lineNumber, lineContent);
         }
 
         // Edge case
