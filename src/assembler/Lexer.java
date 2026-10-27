@@ -46,7 +46,7 @@ public class Lexer {
                     }
                 }
                 // Handle dereference tokens ([])
-                if (token.startsWith("[") || token.endsWith("]")) {
+                if (token.contains("[") || token.contains("]")) {
                     validateDereference(token, i + 1, lines[i]);
                     tokens.add(new Token(TokenType.DEREFERENCE, token, i + 1));
                 }
