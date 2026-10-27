@@ -113,17 +113,27 @@ public class Lexer {
 
     /**
      * Validates a token that ends with {@code ':'}, ensuring it contains no other colons.
+     * Also catches the edge case in which a reserved keyword is used as an identifier.
      * 
      * <p><b>Assumption</b>: {@code token} ends with {@code ':'}.
      * 
      * @param token The raw token to validate.
      * @param lineNumber The line number (for error reporting).
      * @param lineContent The raw content of the entire line (for error reporting).
-     * @throws SyntaxException If brackets are mismatched or improperly placed.
+     * @throws SyntaxException If the token is an invalid identifier.
      */
     private void validateIdentifier(String token, int lineNumber, String lineContent) throws SyntaxException {
         if (token.indexOf(':') != token.length() - 1) {
             throw new SyntaxException("Invalid placement of character ':'.", lineNumber, lineContent);
+        }
+
+        // Edge case
+        String identifier = token.substring(0, token.length() - 1);
+        if (Format.parseInstruction(identifier) != null) {
+            throw new SyntaxException(
+                "Reserved keyword '" + identifier + "' cannot be used as an identifier.",
+                lineNumber, lineContent
+            );
         }
     }
 }
