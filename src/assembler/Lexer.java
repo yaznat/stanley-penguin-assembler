@@ -52,7 +52,7 @@ public class Lexer {
                 }
                 // Handle instruction
                 else if (Format.parseInstruction(token) != null) {
-                    tokens.add(new Token(TokenType.DEREFERENCE, token, i + 1));
+                    tokens.add(new Token(TokenType.INSTRUCTION, token, i + 1));
                 }
                 // Handle identifier (:)
                 else if (token.endsWith(":")) {
