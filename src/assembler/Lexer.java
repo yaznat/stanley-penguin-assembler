@@ -10,15 +10,13 @@ public class Lexer {
     public Lexer() {}
 
     /**
-     * Parses raw file content into a sequence of structured tokens. Lines are split by newline tokens.
-     * @param fileContent The raw file content. 
+     * Splits raw file content into a sequence of structured tokens. Lines are delimited by newline tokens.
+     * @param lines The raw file content, split by lines (empty lines should be included as {@code ""}). 
      * @return The list of parsed tokens.
      * @throws SyntaxException If disallowed chars are present or if key chars are used improperly.
      */
-    public List<Token> lex(String fileContent) throws SyntaxException {
+    public List<Token> lex(String[] lines) throws SyntaxException {
         List<Token> tokens = new ArrayList<>();
-
-        String[] lines = fileContent.split("\n", -1);
 
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].isEmpty()) continue;
