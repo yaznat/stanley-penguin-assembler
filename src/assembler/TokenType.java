@@ -1,8 +1,9 @@
 package assembler;
 
 public enum TokenType {
+    LABEL,
     IDENTIFIER,
-    VALUE,
+    INTEGER,
     INSTRUCTION,
     DEREFERENCE,
     NEWLINE,
