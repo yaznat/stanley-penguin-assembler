@@ -3,6 +3,8 @@ package assembler;
 import java.util.ArrayList;
 import java.util.List;
 
+import exception.SyntaxException;
+
 /**
  * Interprets raw file content into tokens.
  */
