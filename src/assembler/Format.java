@@ -54,4 +54,39 @@ public final class Format {
     public static boolean isAllowed(char c) {
         return c < 123 && IS_ALLOWED[c];
     }
+
+    /**
+     * Determines if a string represents an integer.
+     * 
+     * <p>
+     * <b>Intentionally does not catch overflow: uses {@code Long.parseLong()}.</b>
+     * 
+     * @param s The string to evaluate.
+     * @return {@code true} if the string is a valid integer, else {@code false}.
+     */
+    public static boolean isNumericInteger(String s) {
+        if (s == null || s.trim().isEmpty()) {
+            return false;
+        }
+
+        String cleaned = s.trim();
+
+        if (cleaned.startsWith("0x") || cleaned.startsWith("0X") ||
+                cleaned.startsWith("-0x") || cleaned.startsWith("-0X")) {
+            try {
+                String hexDigits = cleaned.replace("-", "").substring(2);
+                Long.parseLong(hexDigits, 16);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        try {
+            Long.parseLong(cleaned);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
