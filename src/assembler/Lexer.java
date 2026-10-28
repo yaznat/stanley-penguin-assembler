@@ -118,9 +118,15 @@ public class Lexer {
 
         // Ensure brackets are matched
         for (int i = 0; i < token.length() / 2; i++) {
+            if (token.charAt(i) != '[') break;
             if ((token.charAt(i) == '[') != (token.charAt(token.length() - i - 1) == ']')) {
                 throw new SyntaxException("Unmatched brackets.", lineNumber, lineContent);
             }
+        }
+
+        // TEMPORARY: limit to one dereference
+        if (token.lastIndexOf('[') != 0) {
+            throw new SyntaxException("Nested dereferences not supported.", lineNumber, lineContent);
         }
     }
 
