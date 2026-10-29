@@ -40,7 +40,7 @@ public final class Format {
 
     static {
         // Bitmask for O(1) lookup
-        for (char c : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_:[]".toCharArray()) {
+        for (char c : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-:[]".toCharArray()) {
             IS_ALLOWED[c] = true;
         }
     }
@@ -89,4 +89,34 @@ public final class Format {
             return false;
         }
     }
+
+    /**
+     * Encodes a program word into a 32-bit integer.
+     * @param opcode The opcode, in the range 0-F.
+     * @param operand The operand, representing either a signed or unsigned 28-bit integer.
+     * @param signed Whether the operand should be treated as signed.
+     * @return The corresponding 32-bit integer.
+     */
+    public static int encodeWord(int opcode, int operand, boolean signed) {
+        if (opcode < 0 || opcode > 0xF) {
+            throw new IllegalArgumentException("Invalid opcode");
+        }
+
+        if (signed) {
+            if (operand < -(1 << 27) || operand > (1 << 27) - 1) {
+                throw new IllegalArgumentException("Signed operand out of range");
+            }
+        } else {
+            if (operand < 0 || operand > 0x0FFFFFFF) {
+                throw new IllegalArgumentException("Unsigned operand out of range");
+            }
+        }
+
+        return (opcode << Format.VALUE_SIZE_BITS) | (operand & 0x0FFFFFFF);
+    }
+
+    /**
+     * The number of bits reserved for the value in a program word.
+     */
+    public static final int VALUE_SIZE_BITS = 28;
 }

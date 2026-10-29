@@ -1,0 +1,10 @@
+JMP     start            ; begin by jumping over the data area
+pow:    1                ; store the current power value here
+limit:  1000000          ; we'll be computing powers up to this amount
+start:  LOAD    [pow]    ; load value stored at location 'pow' into acc
+        WRITE   100      ; output the current power to port 100
+        ADD     [pow]    ; add value stored a location 'pow' to value in acc
+        STORE   pow      ; store it back to location 'pow' (for next time)
+        SUB     [limit]  ; compare with value stored at location 'limit'
+        JLZ     start    ; if result is less than zero, go again
+end:    JMP     end      ; this "stops" the program!
