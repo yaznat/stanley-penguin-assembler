@@ -53,7 +53,7 @@ The following example is from the CMSI 2210 [course website](https://bjohnson.lm
    30000064           WRITE   100      ; output the current power to port 100
    40000001           ADD     [pow]    ; add value stored a location 'pow' to value in acc
    10000001           STORE   pow      ; store it back to location 'pow' (for next time)
-   50000002           SUB     [limit]  ; compare with value stored at location 'limit'
+   500F4240           SUB     [limit]  ; compare with value stored at location 'limit'
    E0000003           JLZ     start    ; if result is less than zero, go again
    C0000009   end:    JMP     end      ; this "stops" the program!
 ```
