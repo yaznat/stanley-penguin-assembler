@@ -149,33 +149,50 @@ public class Parser {
             List<Token> tokens,
             String[] lines,
             HashMap<String, Integer> symbolTable) throws SyntaxException {
-        int lastIdentifier = -1;
-        int emptyLineCount = 0;
+
+        int wordIndex = 0;
+        int lastLabelLine = -1;
+        boolean statementHasContent = false;
+
         for (int i = 0; i < tokens.size(); i++) {
             Token t = tokens.get(i);
+
             if (t.type() == TokenType.LABEL) {
-                // Syntax checks
-                if (lastIdentifier == t.line()) {
+                if (lastLabelLine == t.line()) {
                     throw new SyntaxException(
                             "Duplicate label '" + t.lexeme() + "'.",
                             t.line(), lines[t.line() - 1]);
                 }
-                if (i != 0 && tokens.get(i - 1).line() == t.line()) {
+
+                if (statementHasContent) {
                     throw new SyntaxException(
                             "Misplaced label '" + t.lexeme() + "'.",
                             t.line(), lines[t.line() - 1]);
                 }
-                if (i != tokens.size() - 1 && tokens.get(i + 1).type() == TokenType.NEWLINE) {
+
+                if (i == tokens.size() - 1 ||
+                        tokens.get(i + 1).type() == TokenType.NEWLINE) {
                     throw new SyntaxException(
                             "Empty label '" + t.lexeme() + "'.",
                             t.line(), lines[t.line() - 1]);
                 }
-                int lineIndex = t.line() - emptyLineCount - 1;
-                lastIdentifier = t.line();
-                symbolTable.put(t.lexeme(), lineIndex);
-            } else if (t.type() == TokenType.NEWLINE &&
-                    (i == 0 || tokens.get(i - 1).type() == TokenType.NEWLINE)) {
-                emptyLineCount++;
+
+                if (symbolTable.putIfAbsent(t.lexeme(), wordIndex) != null) {
+                    throw new SyntaxException(
+                            "Duplicate label '" + t.lexeme() + "'.",
+                            t.line(), lines[t.line() - 1]);
+                }
+
+                lastLabelLine = t.line();
+                statementHasContent = true;
+
+            } else if (t.type() == TokenType.NEWLINE) {
+                if (statementHasContent) {
+                    wordIndex++;
+                    statementHasContent = false;
+                }
+            } else {
+                statementHasContent = true;
             }
         }
     }
