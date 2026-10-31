@@ -1,14 +1,8 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
-import assembler.Lexer;
-import assembler.Parser;
-import assembler.Token;
-import exception.CyclicDereferenceException;
-import exception.OverflowException;
-import exception.SyntaxException;
+import assembler.Compiler;
 
 /**
  * A demonstration of the Stanley/Penguin compiler.
@@ -18,37 +12,41 @@ import exception.SyntaxException;
  */
 public class Main {
     private static final String SOURCE_PATH = "./scripts/demo.peng";
+    private static final String OUT_PATH = "./out/demo.egg";
 
     public static void main(String[] args) {
-        System.out.println("Stanley/Penguin Compilation Demo");
+        System.out.println("=== Stanley/Penguin Compilation Demo ===");
 
-        Lexer l = new Lexer();
-        Parser p = new Parser();
+        Compiler c = new Compiler();
 
         try {
-            Path file = Path.of(SOURCE_PATH);
-            String fileContent = Files.readString(file);
-            String[] lines = fileContent.split("\n", -1);
+            c.compile(SOURCE_PATH, OUT_PATH);
 
-            try {
-                List<Token> tokens = l.lex(lines);
-                List<Integer> words = p.parse(tokens, lines);
-
-                System.out.println("===== MACHINE CODE: =====");
-                for (Integer w : words) {
-                    String hex = Integer.toHexString(w).toUpperCase();
-                    System.out.println("0".repeat(Math.max(0, 8 - hex.length())) + hex);
-                }
-            } catch (SyntaxException e) {
-                System.out.println(e.getMessage());
-            } catch (OverflowException e) {
-                System.out.println(e.getMessage());
-            } catch (CyclicDereferenceException e) {
-                System.out.println(e.getMessage());
-            }
+            // Read and print results
+            System.out.println("Program words:");
+            printEggPayload(OUT_PATH);
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Prints the program words stored in a {@code .egg} file, line by line.
+     * @param filepath Path to a {@code .egg} file.
+     * @throws IOException If the file doesn't exist.
+     */
+    private static void printEggPayload(String filepath) throws IOException {
+        byte[] fileBytes = Files.readAllBytes(Path.of(filepath));
+        int headerSize = 12;
+
+        for (int i = 0; i < fileBytes.length - headerSize; i++) {
+            String hex = String.format("%02X", fileBytes[headerSize + i]);
+            System.out.print("0".repeat(Math.max(0, 2 - hex.length())) + hex);
+
+            if ((i + 1) % 4 == 0) {
+                System.out.println();
+            }
         }
     }
 }
