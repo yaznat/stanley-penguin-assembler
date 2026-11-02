@@ -59,6 +59,11 @@ public class Parser {
                             "Duplicate instruction '" + t.lexeme() + "'.",
                             t.line(), lines[t.line() - 1]);
                 }
+                if (async || operand != null) {
+                    throw new SyntaxException(
+                            "Misplaced instruction '" + t.lexeme() + "'.",
+                            t.line(), lines[t.line() - 1]);
+                }
                 opcode = Format.parseInstruction(t.lexeme()).getOpcode();
             } else if (t.type() == TokenType.IDENTIFIER) {
                 Integer location = symbolTable.getOrDefault(t.lexeme(), null);
@@ -209,7 +214,7 @@ public class Parser {
                 value = Long.parseLong(hexDigits, 16);
             } catch (NumberFormatException e) {
                 throw new RuntimeException(
-                        "Unexpected error: token marked INTEGER could not be" +
+                        "Unexpected error: token marked INTEGER could not be " +
                                 "parsed into an integer - this should never occur.");
             }
         } else {
@@ -217,7 +222,7 @@ public class Parser {
                 value = Long.parseLong(lexeme);
             } catch (NumberFormatException e) {
                 throw new RuntimeException(
-                        "Unexpected error: token marked INTEGER could not be" +
+                        "Unexpected error: token marked INTEGER could not be " +
                                 "parsed into an integer - this should never occur.");
             }
 
