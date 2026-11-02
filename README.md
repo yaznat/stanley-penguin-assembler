@@ -66,7 +66,7 @@ As seen in the example:
 
 - We use square brackets to denote dereferencing.
 - We use subtraction to perform comparisons (employing `JZ`, `JLZ`, or `JGZ` for `==`, `<`, and `>`, respectively).
-- Given the lack of a `HALT` instruction, we reserve `end: JMP end` to terminate the program.
+- Given the lack of a `HALT` instruction, we reserve `end: JMP end` to terminate the program. (More specifically, a line that unconditionally jumps to itself terminates the program).
 
 ## `.peng` File Extension
 
@@ -74,7 +74,7 @@ For the purposes of this simulation, Stanley/Penguin source files use the extens
 
 ## `.egg` File Extension
 
-For the purposes of this simulation, compiled binaries use the extension `.egg`, with the following format:
+For the purposes of this simulation, assembled binaries use the extension `.egg`, with the following format:
 
 | Component    | Size     | Description                                                                               |
 | :----------- | :------- | :---------------------------------------------------------------------------------------- |
@@ -87,9 +87,9 @@ Thus, the file header is **12 bytes**.
 
 ## Java Project
 
-This project offers two distinct features: **compilation** and **execution**. The first compiles a source `.peng` file into a `.egg` binary, while the second executes a `.egg` binary via the simulated Stanley/Penguin machine.
+This project offers two distinct features: **assembly** and **execution**. The first assembles a source `.peng` file into a `.egg` binary, while the second executes a `.egg` binary via the simulated Stanley/Penguin machine.
 
-### Compilation
+### Assembly
 
 TODO: instructions
 

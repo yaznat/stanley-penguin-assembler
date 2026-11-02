@@ -11,13 +11,19 @@ import exception.SyntaxException;
 import io.EggWriter;
 
 /**
- * Top-level component that compiles a raw file into binary.
+ * Top-level component that assembles a raw file into binary.
  */
-public class Compiler {
-    public Compiler() {
+public class Assembler {
+    public Assembler() {
     }
 
-    public void compile(String filepath, String outpath) throws IOException {
+    /**
+     * Assembles a raw Stanley/Penguin file into a {@code .egg} binary.
+     * @param filepath Path to a {@code .peng} file.
+     * @param outpath Path to write the assembled file to. (Will overwrite)
+     * @throws IOException If the provided file doesn't exist.
+     */
+    public void assemble(String filepath, String outpath) throws IOException {
         Path file = Path.of(filepath);
         String fileContent = Files.readString(file);
         String[] lines = fileContent.split("\n", -1);

@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import assembler.Compiler;
+import assembler.Assembler;
 
 /**
  * A demonstration of the Stanley/Penguin compiler.
@@ -17,10 +17,10 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("=== Stanley/Penguin Compilation Demo ===");
 
-        Compiler c = new Compiler();
+        Assembler a = new Assembler();
 
         try {
-            c.compile(SOURCE_PATH, OUT_PATH);
+            a.assemble(SOURCE_PATH, OUT_PATH);
 
             // Read and print results
             System.out.println("Program words:");
