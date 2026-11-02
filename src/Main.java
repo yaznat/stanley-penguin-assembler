@@ -20,12 +20,11 @@ public class Main {
         Assembler a = new Assembler();
 
         try {
-            a.assemble(SOURCE_PATH, OUT_PATH);
-
-            // Read and print results
-            System.out.println("Program words:");
-            printEggPayload(OUT_PATH);
-
+            if (a.assemble(SOURCE_PATH, OUT_PATH)) {
+                // Read and print results
+                System.out.println("Program words:");
+                printEggPayload(OUT_PATH);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

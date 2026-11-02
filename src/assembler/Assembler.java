@@ -19,11 +19,14 @@ public class Assembler {
 
     /**
      * Assembles a raw Stanley/Penguin file into a {@code .egg} binary.
+     * 
      * @param filepath Path to a {@code .peng} file.
-     * @param outpath Path to write the assembled file to. (Will overwrite)
+     * @param outpath  Path to write the assembled file to. (Will overwrite)
+     * @return {@code true} if the file was created successfully, else
+     *         {@code false}.
      * @throws IOException If the provided file doesn't exist.
      */
-    public void assemble(String filepath, String outpath) throws IOException {
+    public boolean assemble(String filepath, String outpath) throws IOException {
         Path file = Path.of(filepath);
         String fileContent = Files.readString(file);
         String[] lines = fileContent.split("\n", -1);
@@ -36,6 +39,7 @@ public class Assembler {
             List<Token> tokens = lexer.lex(lines);
             List<Integer> words = parser.parse(tokens, lines);
             writer.saveBinary(words, outpath);
+            return true;
         } catch (SyntaxException e) {
             System.out.println(e.getMessage());
         } catch (OverflowException e) {
@@ -43,5 +47,7 @@ public class Assembler {
         } catch (CyclicDereferenceException e) {
             System.out.println(e.getMessage());
         }
+
+        return false;
     }
 }
