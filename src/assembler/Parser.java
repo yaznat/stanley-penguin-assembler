@@ -210,9 +210,19 @@ public class Parser {
         if (lexeme.startsWith("0x") || lexeme.startsWith("0X") ||
                 lexeme.startsWith("-0x") || lexeme.startsWith("-0X")) {
             try {
-                int startIdx = (lexeme.startsWith("-")) ? 1 : 0;
-                String hexDigits = lexeme.substring(0, startIdx) + lexeme.substring(startIdx + 2);
-                value = Long.parseLong(hexDigits, 16);
+                int startIdx = lexeme.startsWith("-") ? 1 : 0;
+                String hexDigits = lexeme.substring(0, startIdx) +
+                        lexeme.substring(startIdx + 2);
+
+                value = Long.parseUnsignedLong(hexDigits, 16);
+
+                if (signed && startIdx == 0 && value <= 0xFFFFFFFFL) {
+                    value = (int) value;
+                }
+
+                if (startIdx == 1) {
+                    value = -value;
+                }
             } catch (NumberFormatException e) {
                 throw new RuntimeException(
                         "Unexpected error: token marked INTEGER could not be " +

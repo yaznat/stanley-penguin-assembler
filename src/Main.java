@@ -1,14 +1,18 @@
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
+import java.util.HashMap;
 
 import assembler.Assembler;
+import io.EggReader;
+import machine.Machine;
+import machine.Port;
 
 /**
- * A demonstration of the Stanley/Penguin compiler.
+ * A demonstration of the Stanley/Penguin assembler and interpreter.
  * 
  * <p>
- * Compiles Stanley/Penguin assembly into machine code and prints the results.
+ * Assembles Stanley/Penguin assembly into machine code, prints the results,
+ * then executes the program.
  */
 public class Main {
     private static final String SOURCE_PATH = "./scripts/demo.peng";
@@ -21,31 +25,31 @@ public class Main {
 
         try {
             if (a.assemble(SOURCE_PATH, OUT_PATH)) {
-                // Read and print results
+                // Read results
                 System.out.println("Program words:");
-                printEggPayload(OUT_PATH);
+
+                EggReader e = new EggReader();
+                int[] programWords = e.readPayload(OUT_PATH);
+
+                // Print machine code
+                for (int i = 0; i < programWords.length; i++) {
+                    String hex = String.format("%08X", programWords[i]);
+                    System.out.println("0".repeat(Math.max(0, 8 - hex.length())) + hex);
+                }
+
+                System.out.println();
+
+                // Run program
+                System.out.println("Running program:");
+
+                HashMap<Port, Integer> portMapping = new HashMap<>();
+                portMapping.put(Port.TERMINAL_RAW, 100); // matches the demo
+
+                Machine m = new Machine(portMapping);
+                m.execute(programWords);
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Prints the program words stored in a {@code .egg} file, line by line.
-     * @param filepath Path to a {@code .egg} file.
-     * @throws IOException If the file doesn't exist.
-     */
-    private static void printEggPayload(String filepath) throws IOException {
-        byte[] fileBytes = Files.readAllBytes(Path.of(filepath));
-        int headerSize = 12;
-
-        for (int i = 0; i < fileBytes.length - headerSize; i++) {
-            String hex = String.format("%02X", fileBytes[headerSize + i]);
-            System.out.print("0".repeat(Math.max(0, 2 - hex.length())) + hex);
-
-            if ((i + 1) % 4 == 0) {
-                System.out.println();
-            }
         }
     }
 }

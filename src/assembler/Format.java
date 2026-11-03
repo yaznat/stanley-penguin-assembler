@@ -110,5 +110,8 @@ public final class Format {
      */
     public static final int OPERAND_SIZE_BITS = 27;
 
+    /**
+     * Mask that extracts the operand from a 32-bit integer.
+     */
     public static final int OPERAND_MASK = 0x07FFFFFF;
 }
