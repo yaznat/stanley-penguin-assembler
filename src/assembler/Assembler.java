@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import exception.CyclicDereferenceException;
 import exception.OverflowException;
 import exception.SyntaxException;
 import io.EggWriter;
@@ -43,8 +42,6 @@ public class Assembler {
         } catch (SyntaxException e) {
             System.out.println(e.getMessage());
         } catch (OverflowException e) {
-            System.out.println(e.getMessage());
-        } catch (CyclicDereferenceException e) {
             System.out.println(e.getMessage());
         }
 
