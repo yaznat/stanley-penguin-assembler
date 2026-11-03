@@ -26,11 +26,12 @@ public class Lexer {
         List<Token> tokens = new ArrayList<>();
 
         for (int i = 0; i < lines.length; i++) {
-            if (lines[i].isEmpty())
+            String cleaned = lines[i].trim();
+
+            if (cleaned.isEmpty())
                 continue;
 
             // Truncate comments
-            String cleaned = lines[i].trim();
             int semicolonIndex = cleaned.indexOf(";");
             if (semicolonIndex == 0)
                 continue;
@@ -38,7 +39,7 @@ public class Lexer {
                 cleaned = cleaned.substring(0, semicolonIndex);
             }
 
-            String[] split = cleaned.trim().split("\\s+");
+            String[] split = cleaned.split("\\s+");
 
             for (String token : split) {
                 // Enforce allowed chars
@@ -118,7 +119,8 @@ public class Lexer {
 
         // Ensure brackets are matched
         for (int i = 0; i < token.length() / 2; i++) {
-            if (token.charAt(i) != '[') break;
+            if (token.charAt(i) != '[')
+                break;
             if ((token.charAt(i) == '[') != (token.charAt(token.length() - i - 1) == ']')) {
                 throw new SyntaxException("Unmatched brackets.", lineNumber, lineContent);
             }
@@ -131,7 +133,8 @@ public class Lexer {
     }
 
     /**
-     * Validates a token that contains {@code ':'}, ensuring the colon is used properly.
+     * Validates a token that contains {@code ':'}, ensuring the colon is used
+     * properly.
      * 
      * Also catches the edge case in which a reserved keyword is used as an
      * label.
