@@ -54,11 +54,11 @@ The following example is adapted from the CMSI 2210 [course website](https://bjo
    C0000003           JMP     start    ; begin by jumping over the data area
    00000001   pow:    1                ; store the current power value here
    000F4240   limit:  1000000          ; we'll be computing powers up to this amount
-   08000001   start:  LOAD    [pow]    ; load value stored at location 'pow' into acc
+   08000001   start:  LOAD    pow      ; load value stored at location 'pow' into acc
    30000064           WRITE   100      ; output the current power to port 100
-   48000001           ADD     [pow]    ; add value stored a location 'pow' to value in acc
+   48000001           ADD     pow      ; add value stored a location 'pow' to value in acc
    10000001           STORE   pow      ; store it back to location 'pow' (for next time)
-   58000002           SUB     [limit]  ; compare with value stored at location 'limit'
+   58000002           SUB     limit    ; compare with value stored at location 'limit'
    E0000003           JLZ     start    ; if result is less than zero, go again
    C0000009   end:    JMP     end      ; this "stops" the program!
 ```
