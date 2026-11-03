@@ -41,7 +41,9 @@ public class PortController {
      * @param value The value to write.
      */
     public void write(int id, int value) {
-        switch (portLookup.get(id)) {
+        Port lookup = portLookup.get(id);
+        if (lookup == null) return;
+        switch (lookup) {
             case Port.TERMINAL_RAW:
                 System.out.println(value);
                 break;
