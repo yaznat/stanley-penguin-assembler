@@ -1,3 +1,4 @@
+; --- Powers of 2 ---
 JMP     start            ; begin by jumping over the data area
 pow:    1                ; store the current power value here
 limit:  1000000          ; we'll be computing powers up to this amount

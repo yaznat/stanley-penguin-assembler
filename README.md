@@ -46,28 +46,57 @@ The following is a list of all instructions:
 | E      | if A < 0 then IP := x | JLZ      | Jump if accumulator is less than zero              |
 | F      | if A > 0 then IP := x | JGZ      | Jump if accumulator is greater than zero           |
 
-## Program Example
-
-The following example is adapted from the CMSI 2210 [course website](https://bjohnson.lmu.build/cmsi2210web/week06.html):
+## Example Programs
 
 ```asm
-   C0000003           JMP     start    ; begin by jumping over the data area
-   00000001   pow:    1                ; store the current power value here
-   000F4240   limit:  1000000          ; we'll be computing powers up to this amount
-   00000001   start:  LOAD    pow      ; load value stored at location 'pow' into acc
-   30000064           WRITE   100      ; output the current power to port 100
-   40000001           ADD     pow      ; add value stored at location 'pow' to value in acc
-   10000001           STORE   pow      ; store it back to location 'pow' (for next time)
-   50000002           SUB     limit    ; compare with value stored at location 'limit'
-   E0000003           JLZ     start    ; if result is less than zero, go again
-   C0000009     end:  JMP     end      ; this "stops" the program!
+; --- Powers of 2 ---
+JMP     start            ; begin by jumping over the data area
+pow:    1                ; store the current power value here
+limit:  1000000          ; we'll be computing powers up to this amount
+start:  LOAD    pow      ; load value stored at location 'pow' into acc
+        WRITE   100      ; output the current power to port 100
+        ADD     pow      ; add value stored at location 'pow' to value in acc
+        STORE   pow      ; store it back to location 'pow' (for next time)
+        SUB     limit    ; compare with value stored at location 'limit'
+        JLZ     start    ; if result is less than zero, go again
+end:    JMP     end      ; this "stops" the program!
 ```
 
-Note that the machine language column is for **illustrative purposes only** and is not a component of the program.
+```asm
+; --- Array demo ---
+         JMP loop          ; begin by jumping over the data area
+
+    one: 1                 ; store for use in increment
+
+  array: 4                 ; pointer to start of array
+ length: 5                 ; number of items in the array
+
+ item_0: 1                
+ item_1: 2
+ item_2: 3
+ item_3: 4
+ item_4: 5
+
+pointer: 4                 ; used to iterate through array items 
+
+
+   loop: LOAD [pointer]    ; load value at address stored in pointer
+         WRITE 100         ; output current array value
+         LOAD pointer      ; load pointer address
+         ADD one           ; increment pointer
+         STORE pointer     ; update pointer
+         LOAD array        ; address of array start
+         ADD length        ; add length of array
+         SUB pointer       ; compare to pointer position
+         JZ end            ; if at end of array, go to end
+         JMP loop          ; else continue loop
+
+    end: JMP end           ;  this "stops" the program!
+```
 
 ## Assembly Syntax
 
-As seen in the example:
+As seen in the examples:
 
 - We use square brackets to denote dereferencing.
 - We use subtraction to perform comparisons (employing `JZ`, `JLZ`, or `JGZ` for `==`, `<`, and `>`, respectively).
