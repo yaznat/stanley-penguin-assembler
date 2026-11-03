@@ -30,7 +30,7 @@ public class Lexer {
                 continue;
 
             // Truncate comments
-            String cleaned = lines[i];
+            String cleaned = lines[i].trim();
             int semicolonIndex = cleaned.indexOf(";");
             if (semicolonIndex == 0)
                 continue;
