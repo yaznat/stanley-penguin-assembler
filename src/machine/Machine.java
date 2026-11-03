@@ -62,10 +62,11 @@ public class Machine {
             int operand = instruction & Format.OPERAND_MASK; // unsigned
 
             boolean dereference = (instruction & (1 << Format.OPERAND_SIZE_BITS)) != 0;
-            int operationalValue = (dereference) ? memory.read(operand) : operand;
+            int operationalValue = (dereference) ? memory.read(memory.read(operand)) : memory.read(operand);
+            int jumpValue = (dereference) ? memory.read(operand) : operand;
 
             // Halt case: unconditional jump to current line
-            if (opcode == Instruction.JMP.getOpcode() && operationalValue == instructionPointer) {
+            if (opcode == Instruction.JMP.getOpcode() && jumpValue == instructionPointer) {
                 return;
             }
 
@@ -76,11 +77,11 @@ public class Machine {
             if (opcode == Instruction.LOAD.getOpcode()) {
                 accumulator = operationalValue;
             } else if (opcode == Instruction.STORE.getOpcode()) {
-                memory.write(operationalValue, accumulator);
+                memory.write(jumpValue, accumulator);
             } else if (opcode == Instruction.READ.getOpcode()) {
-                accumulator = portController.read(operationalValue);
+                accumulator = portController.read(jumpValue);
             } else if (opcode == Instruction.WRITE.getOpcode()) {
-                portController.write(operationalValue, accumulator);
+                portController.write(jumpValue, accumulator);
             } else if (opcode == Instruction.ADD.getOpcode()) {
                 accumulator += operationalValue;
             } else if (opcode == Instruction.SUB.getOpcode()) {
@@ -98,22 +99,22 @@ public class Machine {
             } else if (opcode == Instruction.XOR.getOpcode()) {
                 accumulator = accumulator ^ operationalValue;
             } else if (opcode == Instruction.JMP.getOpcode()) {
-                validateJump(operationalValue, programCutoff);
-                instructionPointer = operationalValue;
+                validateJump(jumpValue, programCutoff);
+                instructionPointer = jumpValue;
             } else if (opcode == Instruction.JZ.getOpcode()) {
                 if (accumulator == 0) {
-                    validateJump(operationalValue, programCutoff);
-                    instructionPointer = operationalValue;
+                    validateJump(jumpValue, programCutoff);
+                    instructionPointer = jumpValue;
                 }
             } else if (opcode == Instruction.JLZ.getOpcode()) {
                 if (accumulator < 0) {
-                    validateJump(operationalValue, programCutoff);
-                    instructionPointer = operationalValue;
+                    validateJump(jumpValue, programCutoff);
+                    instructionPointer = jumpValue;
                 }
             } else if (opcode == Instruction.JGZ.getOpcode()) {
                 if (accumulator > 0) {
-                    validateJump(operationalValue, programCutoff);
-                    instructionPointer = operationalValue;
+                    validateJump(jumpValue, programCutoff);
+                    instructionPointer = jumpValue;
                 }
             }
         }
