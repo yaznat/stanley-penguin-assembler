@@ -20,8 +20,7 @@ public class Parser {
     public record AsyncReference(
             int sourceLineOpcode,
             int sourceLine,
-            int destLine,
-            boolean signed) {
+            int destLine) {
     }
 
     /**
@@ -103,13 +102,8 @@ public class Parser {
                 }
 
                 int sourceLine = programWords.size();
-                boolean signed = opcode == null || !(opcode < 0x4 || opcode > 0xA);
 
-                referenceStack.add(new AsyncReference(
-                        (opcode == null) ? 0 : opcode,
-                        sourceLine,
-                        location,
-                        signed));
+                referenceStack.add(new AsyncReference(opcode, sourceLine, location));
 
                 async = true;
             } else if (t.type() == TokenType.NEWLINE && (opcode != null || operand != null || async)) {
@@ -122,8 +116,15 @@ public class Parser {
                                 "Missing operand for instruction.",
                                 t.line(), lines[t.line() - 1]);
                     }
-                    boolean signed = opcode == null || !(opcode < 0x4 || opcode > 0xA);
-                    programWords.add(Format.encodeWord((opcode == null) ? 0 : opcode, operand, signed));
+
+                    if (opcode == null) {
+                        // 32-bit signed integer value
+                        programWords.add(operand);
+                    } else {
+                        boolean signed = false;
+                        overflowCheck(operand, signed, Format.OPERAND_SIZE_BITS, t.line(), lines[t.line() - 1]);
+                        programWords.add(Format.encodeWord(opcode, operand, signed, async));
+                    }
                 }
 
                 // Reset state
@@ -225,21 +226,38 @@ public class Parser {
                         "Unexpected error: token marked INTEGER could not be " +
                                 "parsed into an integer - this should never occur.");
             }
+        }
 
-        }
-        if (signed && (value < -(1 << (Format.VALUE_SIZE_BITS - 1))
-                || value > (1 << (Format.VALUE_SIZE_BITS - 1)) - 1)) {
-            throw new OverflowException(lexeme, signed, lineNumber, line);
-        }
-        if (!signed && value > (1 << Format.VALUE_SIZE_BITS) - 1) {
-            throw new OverflowException(lexeme, signed, lineNumber, line);
-        }
-        if (!signed && value < 0) {
-            // TODO: create aptly named exception for this
-            throw new SyntaxException("Expected unsigned integer but received '" + lexeme + "'.",
-                    lineNumber, line);
-        }
+        overflowCheck(value, signed, 32, lineNumber, line);
+
         return (int) value;
+    }
+
+    private void overflowCheck(long value, boolean signed, int bitSize,
+            int lineNumber, String line) {
+
+        if (signed) {
+            long min = -(1L << (bitSize - 1));
+            long max = (1L << (bitSize - 1)) - 1;
+
+            if (value < min || value > max) {
+                throw new OverflowException(
+                        String.valueOf(value), signed, bitSize, lineNumber, line);
+            }
+        } else {
+            long max = (1L << bitSize) - 1;
+
+            if (value > max) {
+                throw new OverflowException(
+                        String.valueOf(value), signed, bitSize, lineNumber, line);
+            }
+
+            if (value < 0) {
+                throw new SyntaxException(
+                        "Expected unsigned integer but received '" + value + "'.",
+                        lineNumber, line);
+            }
+        }
     }
 
     /**
@@ -276,13 +294,7 @@ public class Parser {
             // Resolve the target before reading its value
             resolveWord(ref.destLine(), programWords, references, states, lines);
 
-            int targetWord = programWords.get(ref.destLine());
-            int operand = targetWord & 0x0FFFFFFF;
-
-            int resolvedWord = Format.encodeWord(
-                    ref.sourceLineOpcode(),
-                    operand,
-                    ref.signed());
+            int resolvedWord = Format.encodeWord(ref.sourceLineOpcode(), ref.destLine(), false, true);
 
             programWords.set(wordIndex, resolvedWord);
         }

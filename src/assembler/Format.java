@@ -92,31 +92,23 @@ public final class Format {
 
     /**
      * Encodes a program word into a 32-bit integer.
-     * @param opcode The opcode, in the range 0-F.
-     * @param operand The operand, representing either a signed or unsigned 28-bit integer.
-     * @param signed Whether the operand should be treated as signed.
+     * 
+     * @param opcode      The opcode, in the range 0-F.
+     * @param operand     The operand, representing either a signed or unsigned
+     *                    27-bit integer.
+     * @param signed      Whether the operand should be treated as signed.
+     * @param dereference Whether the operand is a dereference.
      * @return The corresponding 32-bit integer.
      */
-    public static int encodeWord(int opcode, int operand, boolean signed) {
-        if (opcode < 0 || opcode > 0xF) {
-            throw new IllegalArgumentException("Invalid opcode");
-        }
-
-        if (signed) {
-            if (operand < -(1 << 27) || operand > (1 << 27) - 1) {
-                throw new IllegalArgumentException("Signed operand out of range");
-            }
-        } else {
-            if (operand < 0 || operand > 0x0FFFFFFF) {
-                throw new IllegalArgumentException("Unsigned operand out of range");
-            }
-        }
-
-        return (opcode << Format.VALUE_SIZE_BITS) | (operand & 0x0FFFFFFF);
+    public static int encodeWord(int opcode, int operand, boolean signed, boolean dereference) {
+        return (opcode << Format.OPERAND_SIZE_BITS + 1) | (dereference ? (1 << Format.OPERAND_SIZE_BITS) : 0)
+                | (operand & OPERAND_MASK);
     }
 
     /**
      * The number of bits reserved for the value in a program word.
      */
-    public static final int VALUE_SIZE_BITS = 28;
+    public static final int OPERAND_SIZE_BITS = 27;
+
+    public static final int OPERAND_MASK = 0x07FFFFFF;
 }
