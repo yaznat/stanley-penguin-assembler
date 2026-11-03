@@ -61,6 +61,29 @@ start:  LOAD    pow      ; load value stored at location 'pow' into acc
         JLZ     start    ; if result is less than zero, go again
 end:    JMP     end      ; this "stops" the program!
 ```
+Output:
+```
+1
+2
+4
+8
+16
+32
+64
+128
+256
+512
+1024
+2048
+4096
+8192
+16384
+32768
+65536
+131072
+262144
+524288
+```
 
 ```asm
 ; --- Array demo ---
@@ -81,17 +104,24 @@ pointer: 4                 ; used to iterate through array items
 
 
    loop: LOAD [pointer]    ; load value at address stored in pointer
-         WRITE 100         ; output current array value
+         WRITE 100         ; output current array value to port 100
          LOAD pointer      ; load pointer address
          ADD one           ; increment pointer
          STORE pointer     ; update pointer
          LOAD array        ; address of array start
          ADD length        ; add length of array
          SUB pointer       ; compare to pointer position
-         JZ end            ; if at end of array, go to end
-         JMP loop          ; else continue loop
+         JGZ loop          ; if result is greater than zero, go again
 
     end: JMP end           ;  this "stops" the program!
+```
+Output:
+```
+1
+2
+3
+4
+5
 ```
 
 ## Assembly Syntax
