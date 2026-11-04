@@ -48,6 +48,8 @@ The following is a list of all instructions:
 
 ## Example Programs
 
+Powers of 2:
+
 ```asm
 ; --- Powers of 2 ---
 JMP     start            ; begin by jumping over the data area
@@ -61,7 +63,9 @@ start:  LOAD    pow      ; load value stored at location 'pow' into acc
         JLZ     start    ; if result is less than zero, go again
 end:    JMP     end      ; this "stops" the program!
 ```
+
 Output:
+
 ```
 1
 2
@@ -85,37 +89,41 @@ Output:
 524288
 ```
 
+Array:
+
 ```asm
 ; --- Array demo ---
-         JMP loop          ; begin by jumping over the data area
+         JMP   loop        ; begin by jumping over the data area
 
     one: 1                 ; store for use in increment
 
-  array: 4                 ; pointer to start of array
+  array: item_0            ; pointer to start of array
  length: 5                 ; number of items in the array
 
- item_0: 1                
+ item_0: 1
  item_1: 2
  item_2: 3
  item_3: 4
  item_4: 5
 
-pointer: 4                 ; used to iterate through array items 
+pointer: item_0            ; used to iterate through array items
 
 
-   loop: LOAD [pointer]    ; load value at address stored in pointer
-         WRITE 100         ; output current array value to port 100
-         LOAD pointer      ; load pointer address
-         ADD one           ; increment pointer
-         STORE pointer     ; update pointer
-         LOAD array        ; address of array start
-         ADD length        ; add length of array
-         SUB pointer       ; compare to pointer position
-         JGZ loop          ; if result is greater than zero, go again
+   loop: LOAD   [pointer]  ; load value at address stored in pointer
+         WRITE  100        ; output current array value to port 100
+         LOAD   pointer    ; load pointer address
+         ADD    one        ; increment pointer
+         STORE  pointer    ; update pointer
+         LOAD   array      ; address of array start
+         ADD    length     ; add length of array
+         SUB    pointer    ; compare to pointer position
+         JGZ    loop       ; if result is greater than zero, go again
 
-    end: JMP end           ;  this "stops" the program!
+    end: JMP    end        ;  this "stops" the program!
 ```
+
 Output:
+
 ```
 1
 2
