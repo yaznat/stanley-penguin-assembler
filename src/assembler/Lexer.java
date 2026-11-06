@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exception.SyntaxException;
+import machine.SystemConfig;
 
 /**
  * Interprets raw file content into tokens.
@@ -61,6 +62,11 @@ public class Lexer {
                 // Handle instruction
                 else if (Format.parseInstruction(token) != null) {
                     tokens.add(new Token(TokenType.INSTRUCTION, token, i + 1));
+                }
+                // Handle named addresses
+                else if (SystemConfig.getAddress(token) != null) {
+                    tokens.add(new Token(TokenType.INTEGER,
+                            String.valueOf(SystemConfig.getAddress(token)), i + 1));
                 }
                 // Handle label (:)
                 else if (token.contains(":")) {
@@ -152,11 +158,20 @@ public class Lexer {
             throw new SyntaxException("Misplaced ':' in token '" + token + "'.", lineNumber, lineContent);
         }
 
-        // Edge case
+        // Enforce usage
         String label = token.substring(0, token.length() - 1);
         if (Format.parseInstruction(label) != null) {
             throw new SyntaxException(
                     "Reserved keyword '" + label + "' cannot be used as a label.",
+                    lineNumber, lineContent);
+        } else if (SystemConfig.getAddress(label) != null) {
+            throw new SyntaxException(
+                    "Reserved address name '" + label + "' cannot be used as a label.",
+                    lineNumber, lineContent);
+        }
+        else if (Format.isNumericInteger(label)) {
+            throw new SyntaxException(
+                    "Integer '" + label + "' cannot be used as a label.",
                     lineNumber, lineContent);
         }
     }

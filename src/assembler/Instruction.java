@@ -36,4 +36,13 @@ public enum Instruction {
     public int getOperandCount() {
         return operandCount;
     }
+
+    public static Instruction fromOpcode(int opcode) {
+        for (Instruction instruction : values()) {
+            if (instruction.opcode == opcode) {
+                return instruction;
+            }
+        }
+        throw new IllegalArgumentException("Invalid opcode: " + opcode);
+    }
 }

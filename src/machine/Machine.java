@@ -2,17 +2,16 @@ package machine;
 
 import java.util.HashMap;
 
-import assembler.Format;
 import assembler.Instruction;
 import exception.MemoryIndexException;
 import exception.OutOfMemoryException;
 import exception.ProgramIndexException;
+import exception.ProtectedAddressException;
 
 /**
  * Top-level simulated Stanley/Penguin machine.
  */
 public class Machine {
-    private int instructionPointer;
     private int accumulator;
 
     private VirtualMemory memory;
@@ -31,7 +30,6 @@ public class Machine {
      * @param portMapping An optional custom mapping of ports to specific IDs.
      */
     public Machine(HashMap<Port, Integer> portMapping) {
-        instructionPointer = 0;
         accumulator = 0;
         memory = new VirtualMemory();
         portController = new PortController((portMapping == null) ? new HashMap<>() : portMapping);
@@ -43,92 +41,89 @@ public class Machine {
      * @param programWords A sequence of program words as integers.
      */
     public void execute(int[] programWords) throws MemoryIndexException,
-            OutOfMemoryException, ProgramIndexException {
+            OutOfMemoryException, ProgramIndexException, ProtectedAddressException {
+
+        // Restart IP
+        memory.write(SystemConfig.IP_ADDR, 0, false);
+
         // Load the program into memory
-        memory.loadProgram(programWords);
-
-        int programCutoff = programWords.length - 1;
-
-        instructionPointer = 0;
+        int nextFreeAddress = memory.loadProgram(programWords);
 
         while (true) {
-            if (instructionPointer > programCutoff) {
+            int instructionPointer = memory.read(SystemConfig.IP_ADDR);
+
+            if (instructionPointer >= nextFreeAddress) {
                 return;
             }
 
-            // Unpack values
-            int instruction = memory.read(instructionPointer);
-            int opcode = instruction >>> (Format.OPERAND_SIZE_BITS + 1);
-            int operand = instruction & Format.OPERAND_MASK; // unsigned
+            // Fetch
+            int instructionWord = memory.read(instructionPointer);
 
-            boolean dereference = (instruction & (1 << Format.OPERAND_SIZE_BITS)) != 0;
-            int operationalValue = (dereference) ? memory.read(memory.read(operand)) : memory.read(operand);
-            int jumpValue = (dereference) ? memory.read(operand) : operand;
+            // Decode
+            DecodedInstruction instruction = new DecodedInstruction(instructionWord);
 
-            // Halt case: unconditional jump to current line
-            if (opcode == Instruction.JMP.getOpcode() && jumpValue == instructionPointer) {
-                return;
-            }
-
-            // Increment unless a jump occurs
+            // Increment IP
             instructionPointer++;
+            setIP(instructionPointer);
 
-            // Execute instruction
-            if (opcode == Instruction.LOAD.getOpcode()) {
-                accumulator = operationalValue;
-            } else if (opcode == Instruction.STORE.getOpcode()) {
-                memory.write(jumpValue, accumulator);
-            } else if (opcode == Instruction.READ.getOpcode()) {
-                accumulator = portController.read(jumpValue);
-            } else if (opcode == Instruction.WRITE.getOpcode()) {
-                portController.write(jumpValue, accumulator);
-            } else if (opcode == Instruction.ADD.getOpcode()) {
-                accumulator += operationalValue;
-            } else if (opcode == Instruction.SUB.getOpcode()) {
-                accumulator -= operationalValue;
-            } else if (opcode == Instruction.MUL.getOpcode()) {
-                accumulator *= operationalValue;
-            } else if (opcode == Instruction.DIV.getOpcode()) {
-                accumulator /= operationalValue;
-            } else if (opcode == Instruction.MOD.getOpcode()) {
-                accumulator %= operationalValue;
-            } else if (opcode == Instruction.AND.getOpcode()) {
-                accumulator = accumulator & operationalValue;
-            } else if (opcode == Instruction.OR.getOpcode()) {
-                accumulator = accumulator | operationalValue;
-            } else if (opcode == Instruction.XOR.getOpcode()) {
-                accumulator = accumulator ^ operationalValue;
-            } else if (opcode == Instruction.JMP.getOpcode()) {
-                validateJump(jumpValue, programCutoff);
-                instructionPointer = jumpValue;
-            } else if (opcode == Instruction.JZ.getOpcode()) {
-                if (accumulator == 0) {
-                    validateJump(jumpValue, programCutoff);
-                    instructionPointer = jumpValue;
+            // Resolve operand
+            ResolvedAddress address = new ResolvedAddress(memory, instruction.operand(), instruction.isDereference());
+
+            // Execute
+            Instruction mnemonic = Instruction.fromOpcode(instruction.opcode());
+            switch (mnemonic) {
+                case LOAD -> accumulator = address.asIndirect();
+                case STORE -> memory.write(address.asDirect(), accumulator);
+                case READ -> portController.read(address.asDirect());
+                case WRITE -> portController.write(address.asDirect(), accumulator);
+                case ADD -> accumulator += address.asIndirect();
+                case SUB -> accumulator -= address.asIndirect();
+                case MUL -> accumulator *= address.asIndirect();
+                case DIV -> accumulator /= address.asIndirect();
+                case MOD -> accumulator %= address.asIndirect();
+                case AND -> accumulator = accumulator & address.asIndirect();
+                case OR -> accumulator = accumulator | address.asIndirect();
+                case XOR -> accumulator = accumulator ^ address.asIndirect();
+                case JMP -> {
+                    // Halt case: unconditional jump to current line
+                    if (address.asDirect() == instructionPointer - 1)
+                        return;
+                    conditionalJump(address.asDirect(), nextFreeAddress, true);
                 }
-            } else if (opcode == Instruction.JLZ.getOpcode()) {
-                if (accumulator < 0) {
-                    validateJump(jumpValue, programCutoff);
-                    instructionPointer = jumpValue;
-                }
-            } else if (opcode == Instruction.JGZ.getOpcode()) {
-                if (accumulator > 0) {
-                    validateJump(jumpValue, programCutoff);
-                    instructionPointer = jumpValue;
-                }
+                case JZ -> conditionalJump(address.asDirect(), nextFreeAddress, accumulator == 0);
+                case JLZ -> conditionalJump(address.asDirect(), nextFreeAddress, accumulator < 0);
+                case JGZ -> conditionalJump(address.asDirect(), nextFreeAddress, accumulator > 0);
+                default -> throw new IllegalArgumentException("Unexpected value: " + mnemonic);
             }
+        }
+    }
+
+    /**
+     * Update the instruction pointer in virtual memory.
+     * 
+     * @param value The value to set.
+     */
+    private void setIP(int value) {
+        boolean restricted = false;
+        memory.write(SystemConfig.IP_ADDR, value, restricted);
+    }
+
+    private void conditionalJump(int address, int nextFreeAddress, boolean shouldJump) {
+        if (shouldJump) {
+            validateJump(address, nextFreeAddress);
+            setIP(address);
         }
     }
 
     /**
      * Bound checks a jump.
      * 
-     * @param address       The address to jump to.
-     * @param programLength The number of lines in the program.
+     * @param address         The address to jump to.
+     * @param nextFreeAddress The next address following the program.
      * @throws ProgramIndexException If the jump is out of bounds.
      */
-    private void validateJump(int address, int programLength) throws ProgramIndexException {
-        if (address < 0 || address > programLength) {
+    private void validateJump(int address, int nextFreeAddress) throws ProgramIndexException {
+        if (address < 0 || address >= nextFreeAddress) {
             throw new ProgramIndexException(address);
         }
     }
