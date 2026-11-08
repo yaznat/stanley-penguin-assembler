@@ -29,6 +29,11 @@ public class SystemConfig {
     public static final int IP_ADDR = BEGIN_PROTECTED_ADDR + 0x0;
 
     /**
+     * The location of the per-tick random value in virtual memory.
+     */
+    public static final int RAND_ADDR = BEGIN_PROTECTED_ADDR + 0x1;
+
+    /**
      * Maps a raw string value to a reserved integer address.
      * 
      * @param s The string representation of an address name.
@@ -37,6 +42,7 @@ public class SystemConfig {
     public static Integer getAddress(String s) {
         return switch (s) {
             case "IP_ADDR" -> IP_ADDR;
+            case "RAND_ADDR" -> RAND_ADDR;
             default -> null;
         };
     }

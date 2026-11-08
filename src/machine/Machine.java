@@ -50,6 +50,8 @@ public class Machine {
         int nextFreeAddress = memory.loadProgram(programWords);
 
         while (true) {
+            memory.tick();
+
             int instructionPointer = memory.read(SystemConfig.IP_ADDR);
 
             if (instructionPointer >= nextFreeAddress) {

@@ -1,5 +1,7 @@
 package machine;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import exception.MemoryIndexException;
 import exception.OutOfMemoryException;
 import exception.ProtectedAddressException;
@@ -34,6 +36,13 @@ public class VirtualMemory {
         }
         System.arraycopy(programWords, 0, words, 0, programWords.length);
         return programWords.length;
+    }
+
+    /**
+     * Updates all values that change per-tick.
+     */
+    public void tick() {
+        words[SystemConfig.RAND_ADDR] = ThreadLocalRandom.current().nextInt();
     }
 
     /**
