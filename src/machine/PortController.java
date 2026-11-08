@@ -44,12 +44,8 @@ public class PortController {
         Port lookup = portLookup.get(id);
         if (lookup == null) return;
         switch (lookup) {
-            case Port.TERMINAL_RAW:
-                System.out.println(value);
-                break;
-            case Port.TERMINAL_ASCII:
-                System.out.print((char) value);
-                break;
+            case Port.PRINT_RAW -> System.out.println(value);
+            case Port.PRINT_ASCII -> System.out.print((char) value);
 
             // Default: do nothing
         }

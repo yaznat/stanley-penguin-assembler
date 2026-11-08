@@ -4,8 +4,8 @@ package machine;
  * Defines the ports of the Stanley/Penguin machine.
  */
 public enum Port {
-    TERMINAL_RAW(0x00),
-    TERMINAL_ASCII(0x01);
+    PRINT_RAW(0x00),
+    PRINT_ASCII(0x01);
 
     private final int defaultAddress;
 
