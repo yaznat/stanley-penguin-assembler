@@ -1,0 +1,5 @@
+#!/bin/sh
+
+STANLEY_HOME="$HOME/.local/lib/stanley"
+
+exec java -jar "$STANLEY_HOME/stanley.jar" "$@"
