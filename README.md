@@ -11,7 +11,9 @@ An assembler and interpreter for the Stanley/Penguin machine defined in [CMSI 22
 
 ### Install
 
-Clone the repository and run the installation script:
+Clone the repository and run the installation script for your operating system.
+
+**macOS / Linux**
 
 ```bash
 git clone https://github.com/yaznat/stanley-penguin-assembler.git
@@ -32,15 +34,48 @@ Ensure `~/.local/bin` is included in your `PATH`. On macOS (Zsh), add the follow
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Restart your terminal or reload the configuration:
+Reload your shell configuration:
 
 ```bash
 source ~/.zshrc
 ```
 
+**Windows (PowerShell)**
+
+```powershell
+git clone https://github.com/yaznat/stanley-penguin-assembler.git
+cd stanley-penguin-assembler
+
+.\install.ps1
+```
+
+By default, Stanley/Penguin is installed to:
+
+- `%LOCALAPPDATA%\Stanley\` — Application JAR
+- `%LOCALAPPDATA%\Programs\Stanley\` — Command-line launcher
+
+Ensure `%LOCALAPPDATA%\Programs\Stanley` is included in your `PATH`. To add it permanently:
+
+1. Open Windows Settings and search for **Environment Variables**.
+2. Select **Edit environment variables for your account**.
+3. Under **User variables**, select `Path` and click **Edit**.
+4. Click **New** and add:
+
+   ```text
+   %LOCALAPPDATA%\Programs\Stanley
+   ```
+
+5. Save the changes and restart your terminal.
+
+If PowerShell prevents the installation script from running due to its execution policy, you can run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
 ### Verify Installation
 
-Run the following command to verify that Stanley/Penguin is installed:
+Open a new terminal and run:
 
 ```bash
 stanley --help
