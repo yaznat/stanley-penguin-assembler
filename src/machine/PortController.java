@@ -1,10 +1,12 @@
 package machine;
 
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import exception.PortInUseException;
+import io.FileReader;
 
 /**
  * Abstract controller for Stanley/Penguin ports.
@@ -31,7 +33,7 @@ public class PortController {
      */
     public int read(int id) {
         // TODO: implement
-        throw new UnsupportedOperationException();
+        return 0;
     }
 
     /**
@@ -40,14 +42,55 @@ public class PortController {
      * @param id    The port's ID.
      * @param value The value to write.
      */
-    public void write(int id, int value) {
+    public void write(int id, int value, VirtualMemory memory) {
         Port lookup = portLookup.get(id);
-        if (lookup == null) return;
+        if (lookup == null)
+            return;
         switch (lookup) {
             case Port.PRINT_RAW -> System.out.println(value);
             case Port.PRINT_ASCII -> System.out.print((char) value);
+            case Port.FILE_REQUEST -> handleFileRequest(value, memory);
 
             // Default: do nothing
+        }
+    }
+
+    private void handleFileRequest(int address, VirtualMemory memory) {
+        int strPtr = memory.read(memory.read(address));
+        System.out.println(strPtr);
+        String filepath = parseNullTerminatedString(strPtr, memory);
+        int destAddr = memory.read(address + 1);
+
+        System.out.println(filepath);
+
+        try {
+            int[] unpackedBytes = FileReader.readFile(filepath);
+
+            System.out.println(unpackedBytes.length);
+
+            memory.write(address + 2, 0); // status ok
+
+            for (int i = 0; i < unpackedBytes.length; i++) {
+                memory.write(destAddr++, unpackedBytes[i]);
+            }
+
+            memory.write(address + 3, unpackedBytes.length);
+        } catch (IOException e) {
+            memory.write(address + 2, 1); // error status
+            e.printStackTrace();
+        }
+    }
+
+    private String parseNullTerminatedString(int address, VirtualMemory memory) {
+        StringBuilder sb = new StringBuilder();
+
+        while (true) {
+            int value = memory.read(address++);
+            if (value == 0) {
+                return sb.toString();
+            }
+
+            sb.append((char) value);
         }
     }
 

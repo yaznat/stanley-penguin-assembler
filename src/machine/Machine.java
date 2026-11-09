@@ -42,7 +42,6 @@ public class Machine {
      */
     public void execute(int[] programWords) throws MemoryIndexException,
             OutOfMemoryException, ProgramIndexException, ProtectedAddressException {
-
         // Restart IP
         memory.write(SystemConfig.IP_ADDR, 0, false);
 
@@ -77,7 +76,7 @@ public class Machine {
                 case LOAD -> accumulator = address.asIndirect();
                 case STORE -> memory.write(address.asDirect(), accumulator);
                 case READ -> portController.read(address.asDirect());
-                case WRITE -> portController.write(address.asDirect(), accumulator);
+                case WRITE -> portController.write(address.asDirect(), accumulator, memory);
                 case ADD -> accumulator += address.asIndirect();
                 case SUB -> accumulator -= address.asIndirect();
                 case MUL -> accumulator *= address.asIndirect();
