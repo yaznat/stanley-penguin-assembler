@@ -8,7 +8,7 @@
 
     <groupId>com.yaznat</groupId>
     <artifactId>stanley</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>Stanley/Penguin</name>
     <description>A Stanley/Penguin assembler and interpreter.</description>

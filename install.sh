@@ -18,7 +18,7 @@ echo "Installing Stanley..."
 mkdir -p "$INSTALL_DIR"
 mkdir -p "$BIN_DIR"
 
-cp target/stanley-1.0.0.jar "$INSTALL_DIR/stanley.jar"
+cp target/stanley-1.0.1.jar "$INSTALL_DIR/stanley.jar"
 
 cat > "$BIN_DIR/stanley" <<'EOF'
 #!/bin/sh

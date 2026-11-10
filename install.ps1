@@ -15,7 +15,7 @@ Write-Host "Installing Stanley..."
 New-Item -ItemType Directory -Force -Path $INSTALL_DIR | Out-Null
 New-Item -ItemType Directory -Force -Path $BIN_DIR | Out-Null
 
-Copy-Item "target/stanley-1.0.0.jar" "$INSTALL_DIR/stanley.jar"
+Copy-Item "target/stanley-1.0.1.jar" "$INSTALL_DIR/stanley.jar"
 
 @"
 @echo off

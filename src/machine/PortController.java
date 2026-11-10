@@ -57,16 +57,11 @@ public class PortController {
 
     private void handleFileRequest(int address, VirtualMemory memory) {
         int strPtr = memory.read(memory.read(address));
-        System.out.println(strPtr);
         String filepath = parseNullTerminatedString(strPtr, memory);
         int destAddr = memory.read(address + 1);
 
-        System.out.println(filepath);
-
         try {
             int[] unpackedBytes = FileReader.readFile(filepath);
-
-            System.out.println(unpackedBytes.length);
 
             memory.write(address + 2, 0); // status ok
 
@@ -77,7 +72,6 @@ public class PortController {
             memory.write(address + 3, unpackedBytes.length);
         } catch (IOException e) {
             memory.write(address + 2, 1); // error status
-            e.printStackTrace();
         }
     }
 
