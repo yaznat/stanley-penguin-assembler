@@ -73,12 +73,7 @@ public class Main {
 
         String input = args[1];
 
-        // Initialize port mappings with default addresses
         HashMap<Port, Integer> portMapping = new HashMap<>();
-
-        for (Port port : Port.values()) {
-            portMapping.put(port, port.getDefaultAddress());
-        }
 
         // Parse optional arguments
         for (int i = 2; i < args.length; i++) {

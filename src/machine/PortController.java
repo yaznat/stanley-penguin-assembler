@@ -1,8 +1,10 @@
 package machine;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import exception.PortInUseException;
@@ -109,20 +111,24 @@ public class PortController {
             used.set(pair.getValue());
         }
 
-        // Fill in unspecified ports
+        // Second pass: ports keep their default ID if it is free
+        List<Port> displaced = new ArrayList<>();
         for (Port p : Port.values()) {
             if (!portMappings.containsKey(p)) {
-                // Try default first
                 if (!used.get(p.getDefaultAddress())) {
                     portLookup.put(p.getDefaultAddress(), p);
                     used.set(p.getDefaultAddress());
                 } else {
-                    // Fallback to available
-                    int id = used.nextClearBit(0);
-                    portLookup.put(id, p);
-                    used.set(id);
+                    displaced.add(p);
                 }
             }
+        }
+
+        // Third pass: displaced ports take the first remaining free ID
+        for (Port p : displaced) {
+            int id = used.nextClearBit(0);
+            portLookup.put(id, p);
+            used.set(id);
         }
     }
 }
