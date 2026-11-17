@@ -5,6 +5,10 @@ import java.util.Locale;
 
 import assembler.Assembler;
 import exception.MemoryIndexException;
+import exception.OutOfMemoryException;
+import exception.PortInUseException;
+import exception.ProgramIndexException;
+import exception.ProtectedAddressException;
 import io.EggReader;
 import machine.Machine;
 import machine.Port;
@@ -29,13 +33,10 @@ public class Main {
             }
 
         } catch (IOException e) {
-            System.err.println("I/O error: " + e.getMessage());
+            System.err.println(e.getClass().getSimpleName() + ": " + e.getMessage());
             System.exit(1);
         } catch (IllegalArgumentException e) {
-            System.err.println("Error: " + e.getMessage());
-            System.exit(1);
-        } catch (MemoryIndexException e) {
-            System.err.println("Error: " + e.getMessage());
+            System.err.println(e.getMessage());
             System.exit(1);
         }
     }
@@ -61,7 +62,7 @@ public class Main {
         Assembler assembler = new Assembler();
 
         if (!assembler.assemble(input, output)) {
-            throw new IllegalArgumentException("Assembly failed.");
+            System.exit(1);
         }
     }
 
@@ -88,8 +89,25 @@ public class Main {
         EggReader reader = new EggReader();
         int[] programWords = reader.readPayload(input);
 
-        Machine machine = new Machine(portMapping);
-        machine.execute(programWords);
+        try {
+            Machine machine = new Machine(portMapping);
+            machine.execute(programWords);
+        } catch(PortInUseException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        } catch (MemoryIndexException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        } catch (ProgramIndexException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        } catch (ProtectedAddressException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        } catch (OutOfMemoryException e) {
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
     }
 
     /**

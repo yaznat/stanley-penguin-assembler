@@ -40,9 +40,9 @@ public class Assembler {
             writer.saveBinary(words, outpath);
             return true;
         } catch (SyntaxException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         } catch (OverflowException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
         }
 
         return false;

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import assembler.Instruction;
 import exception.MemoryIndexException;
 import exception.OutOfMemoryException;
+import exception.PortInUseException;
 import exception.ProgramIndexException;
 import exception.ProtectedAddressException;
 
@@ -29,7 +30,7 @@ public class Machine {
      * 
      * @param portMapping An optional custom mapping of ports to specific IDs.
      */
-    public Machine(HashMap<Port, Integer> portMapping) {
+    public Machine(HashMap<Port, Integer> portMapping) throws PortInUseException {
         accumulator = 0;
         memory = new VirtualMemory();
         portController = new PortController((portMapping == null) ? new HashMap<>() : portMapping);
