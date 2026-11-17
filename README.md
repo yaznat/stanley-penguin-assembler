@@ -105,6 +105,6 @@ To execute an egg binary:
 stanley hatch program.egg
 ```
 
-### Docs
+### Documentation
 
 See the [docs](docs/START_HERE.md) to learn more.

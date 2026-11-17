@@ -83,7 +83,7 @@ Given the lack of a `HALT` instruction, Stanley/Penguin establishes the followin
 end: JMP end
 ```
 
-Specifically, executing a line that jumps to itself unconditionally exits the program.
+Specifically, the program exits when it executes a line that jumps to itself unconditionally.
 
 ## Comments
 

@@ -9,7 +9,7 @@ Instructions are assembled into **32-bit** words:
 | Bits (inclusive, 1-indexed) | Purpose                                                             |
 | :-------------------------- | :------------------------------------------------------------------ |
 | 1-4                         | Opcode                                                              |
-| 5                           | Dereference flag — see **Dereferences** in [SYNTAX.md](./SYNTAX.md) |
+| 5                           | Dereference flag — see **Dereferencing** in [SYNTAX.md](./SYNTAX.md) |
 | 6-32                        | Operand **(27 bits)**                                               |
 
 ## Instruction List

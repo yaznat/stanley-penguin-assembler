@@ -13,7 +13,7 @@ Ports can also be reconfigured to custom IDs. This allows students in [CMSI 2210
 Specification example:
 
 ```bash
-stanley nest program.peng --map_ports "PRINT_RAW=1 FILE_REQUEST=0xFF"
+stanley hatch program.peng --map_ports PRINT_RAW=1 FILE_REQUEST=0xFF
 ```
 
 Unspecified ports will retain their default IDs unless overwritten, in which case they will take the next free ID in ascending order.
